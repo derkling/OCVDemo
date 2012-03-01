@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<BarbequeRTRM recipe_version="0.8">
+	<application priority="3">
+		<platform id="org.linux.cgroup">
+			<awms>
+				<awm id="0" name="wm0" value="5">
+					<resources>
+						<tile id="0">
+							<cluster id="0">
+								<pe qty="50"/>
+								<mem units="Mb" qty="5"/>
+							</cluster>
+						</tile>
+					</resources>
+				</awm>
+				<awm id="1" name="wm1" value="10">
+					<resources>
+						<tile id="0">
+							<cluster id="0">
+								<pe qty="100"/>
+								<mem units="Mb" qty="10"/>
+							</cluster>
+						</tile>
+					</resources>
+				</awm>
+				<awm id="2" name="wm2" value="20">
+					<resources>
+						<tile id="0">
+							<cluster id="0">
+								<pe qty="200"/>
+								<mem units="Mb" qty="10"/>
+							</cluster>
+						</tile>
+					</resources>
+				</awm>
+			</awms>
+		</platform>
+	</application>
+</BarbequeRTRM>
+<!-- vim: set tabstop=4 filetype=xml : -->

@@ -1,0 +1,12 @@
+# Source this file to start building
+
+echo -e "\n\n-- Setting up build three"
+[ -d build ] || mkdir -p build
+
+echo -e "-- Configuring RELEASE build profile..."
+cd build && cmake \
+	-DCMAKE_BUILD_TYPE=Release .. \
+	-DCMAKE_INSTALL_PREFIX=../../../out || return 1
+
+echo -e "\n\n\033[1;33mUse '\033[32mmake VERBOSE=1\033[1;33m' to see detailed compilation log\033[0m\n\n"
+
