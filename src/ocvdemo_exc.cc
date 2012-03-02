@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <ctime>
 #include <bbque/utils/timer.h>
 #include <bbque/utils/utility.h>
 
@@ -51,6 +52,11 @@ CvButtons *buttons;
 bool evtExit = false;
 void on_exit(int toggle) {
 	evtExit = true;
+}
+
+bool evtSnapshot;
+void on_snapshot(int toggle) {
+	evtSnapshot = true;
 }
 
 /*******************************************************************************
@@ -123,6 +129,7 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 	// Create simple buttons and attach them to their callback functions
 	buttons = new CvButtons();
 	buttons->addButton(PushButton(10, 10, 110, 20, -1, "Exit", on_exit));
+	buttons->addButton(PushButton(10, 40, 110, 20, -1, "Snapshot", on_snapshot));
 	cvSetMouseCallback(cam.wcap.c_str(), cvButtonsOnMouse, buttons);
 
 	return RTLIB_OK;
@@ -311,6 +318,9 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	if (evtExit)
 		return RTLIB_EXC_WORKLOAD_NONE;
 
+	if (evtSnapshot)
+		Snapshot();
+
 	switch (key) {
 	case 27:
 		return RTLIB_EXC_WORKLOAD_NONE;
@@ -361,3 +371,20 @@ void OCVDemo::DecUpperAwmID() {
 	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
 }
 
+
+void OCVDemo::Snapshot() const {
+	time_t ltime = time(NULL);
+	struct tm *tm = localtime(&ltime);
+	char timestamp[] = "20120302_193300";
+	char filename[] = "/tmp/ocvdemo_display_20120302_193400.png";
+
+	sprintf(timestamp,  "%04d%02d%02d_%02d%02d%02d",
+			tm->tm_year+1900, tm->tm_mon, tm->tm_mday,
+			tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+	sprintf(filename, "/tmp/ocvdemo_frame_%s.png", timestamp);
+	imwrite(filename, cam.frame);
+	sprintf(filename, "/tmp/ocvdemo_display_%s.png", timestamp);
+	imwrite(filename, display);
+	evtSnapshot = false;
+}
