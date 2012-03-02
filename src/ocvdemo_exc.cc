@@ -36,6 +36,10 @@ OCVDemo::Resolution OCVDemo::resolutions[] = {
 	{1280, 1024}
 };
 
+const char *OCVDemo::effectStr[] = {
+	"None"
+};
+
 OCVDemo::OCVDemo(std::string const & name,
 		std::string const & recipe,
 		RTLIB_Services_t *rtlib,
@@ -48,6 +52,7 @@ OCVDemo::OCVDemo(std::string const & name,
 	cam.fps_max = fps_max;
 	cam.frames_count = 0;
 	cam.frames_total = 0;
+	cam.effect_idx = EFF_NONE;
 	fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
 				cam.id, fps_max);
 
@@ -187,12 +192,26 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 
 	snprintf(buff, 64,
 		"AWMs: %d,%d [cur,max] | "
-		"NONE",
-		CurrentAWM(), cnstr.awm
+		"%s",
+		CurrentAWM(), cnstr.awm, effectStr[cam.effect_idx]
 	);
 	TEXT_LINE(display, buff);
 
 	imshow(cam.wcap.c_str(), display);
+
+	return RTLIB_OK;
+}
+
+RTLIB_ExitCode_t OCVDemo::postProcess() {
+
+	if (cam.effect_idx == EFF_NONE)
+		return RTLIB_OK;
+
+	switch (cam.effect_idx) {
+	default:
+		fprintf(stderr, "Unknowen effect required\n");
+		return RTLIB_ERROR;
+	}
 
 	return RTLIB_OK;
 }
@@ -221,6 +240,9 @@ RTLIB_ExitCode_t OCVDemo::onRun() {
 	// Acquired a new images
 	getImage();
 
+	// Apply required effects
+	postProcess();
+
 	// Update FPS accounting
 	updateFps();
 
@@ -241,6 +263,10 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		break;
 	case '-':
 		DecUpperAwmID();
+		break;
+	case 'q':
+		fprintf(stderr, "Disable effects\n");
+		cam.effect_idx = EFF_NONE;
 		break;
 	}
 

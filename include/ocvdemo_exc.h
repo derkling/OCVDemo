@@ -49,6 +49,13 @@ private:
 		RES_COUNT // This must be the last element
 	};
 
+	enum EffectType {
+		EFF_NONE = 0,
+		EFF_COUNT // This must be the last element
+	};
+
+	static const char *effectStr[EFF_COUNT];
+
 	static struct Resolution {
 		uint16_t width;
 		uint16_t height;
@@ -67,6 +74,10 @@ private:
 
 		// Current camera resolution
 		uint8_t resolution_idx;
+
+		// The effect to apply at the image
+		uint8_t effect_idx;
+		Mat effects;
 	} cam;
 #define CAM_WIDTH(CAM) \
 	resolutions[CAM.resolution_idx].width
@@ -82,6 +93,8 @@ private:
 	RTLIB_ExitCode_t getImage();
 	RTLIB_ExitCode_t showImage();
 	double updateFps();
+
+	RTLIB_ExitCode_t postProcess();
 
 	RTLIB_ExitCode_t onSetup();
 	RTLIB_ExitCode_t onConfigure(uint8_t awm_id);
