@@ -37,7 +37,8 @@ OCVDemo::Resolution OCVDemo::resolutions[] = {
 };
 
 const char *OCVDemo::effectStr[] = {
-	"None"
+	"None",
+	"Canny"
 };
 
 OCVDemo::OCVDemo(std::string const & name,
@@ -213,12 +214,25 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	return RTLIB_OK;
 }
 
+RTLIB_ExitCode_t OCVDemo::doCanny() {
+	cvtColor(cam.frame, cam.effects, CV_BGR2GRAY);
+	GaussianBlur(cam.effects, cam.effects, Size(7,7), 1.5, 1.5);
+	Canny(cam.effects, cam.effects, 0, 30, 3);
+	// Ensure image is 3 channel RGB, as required for proper
+	// composition with overlay info
+	cvtColor(cam.effects, cam.effects, CV_GRAY2RGB);
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::postProcess() {
 
 	if (cam.effect_idx == EFF_NONE)
 		return RTLIB_OK;
 
 	switch (cam.effect_idx) {
+	case EFF_CANNY:
+		doCanny();
+		break;
 	default:
 		fprintf(stderr, "Unknowen effect required\n");
 		return RTLIB_ERROR;
@@ -274,6 +288,10 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		break;
 	case '-':
 		DecUpperAwmID();
+		break;
+	case 'c':
+		fprintf(stderr, "Enable [CANNY] effect\n");
+		cam.effect_idx = EFF_CANNY;
 		break;
 	case 'q':
 		fprintf(stderr, "Disable effects\n");

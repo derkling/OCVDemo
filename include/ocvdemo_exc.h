@@ -51,6 +51,7 @@ private:
 
 	enum EffectType {
 		EFF_NONE = 0,
+		EFF_CANNY,
 		EFF_COUNT // This must be the last element
 	};
 
@@ -94,6 +95,7 @@ private:
 	RTLIB_ExitCode_t showImage();
 	double updateFps();
 
+	RTLIB_ExitCode_t doCanny();
 	RTLIB_ExitCode_t postProcess();
 
 	RTLIB_ExitCode_t onSetup();
