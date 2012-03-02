@@ -42,6 +42,18 @@ private:
 
 	double tstart;
 
+	enum ResolutionType {
+		RES_LOW = 0,
+		RES_MID,
+		RES_HIG,
+		RES_COUNT // This must be the last element
+	};
+
+	static struct Resolution {
+		uint16_t width;
+		uint16_t height;
+	} resolutions[RES_COUNT];
+
 	struct Camera {
 		uint8_t id;
 		uint8_t fps_max;
@@ -52,10 +64,19 @@ private:
 		VideoCapture cap;
 		Mat frame;
 		std::string wcap;
+
+		// Current camera resolution
+		uint8_t resolution_idx;
 	} cam;
+#define CAM_WIDTH(CAM) \
+	resolutions[CAM.resolution_idx].width
+#define CAM_HEIGHT(CAM) \
+	resolutions[CAM.resolution_idx].height
+
 
 	RTLIB_Constraint_t cnstr;
 
+	RTLIB_ExitCode_t SetResolution(uint8_t type);
 	void IncUpperAwmID();
 	void DecUpperAwmID();
 	RTLIB_ExitCode_t getImage();

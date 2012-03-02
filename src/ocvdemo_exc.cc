@@ -30,6 +30,12 @@
 using namespace bbque::utils;
 using namespace cv;
 
+OCVDemo::Resolution OCVDemo::resolutions[] = {
+	{ 320,  240},
+	{ 640,  480},
+	{1280, 1024}
+};
+
 OCVDemo::OCVDemo(std::string const & name,
 		std::string const & recipe,
 		RTLIB_Services_t *rtlib,
@@ -58,6 +64,18 @@ OCVDemo::~OCVDemo() {
 
 }
 
+RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
+	if (type >= RES_COUNT)
+		return RTLIB_ERROR;
+
+	cam.resolution_idx = type;
+	cam.cap.set(CV_CAP_PROP_FRAME_WIDTH,  CAM_WIDTH(cam));
+	cam.cap.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT(cam));
+	fprintf(stderr, "Set camera resolution: %d x %d\n",
+			CAM_WIDTH(cam), CAM_HEIGHT(cam));
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::onSetup() {
 	char wcap[] = "CAM99";
 
@@ -73,6 +91,9 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
+
+	// Set initial camara resolution to medium
+	SetResolution(RES_MID);
 
 	// Setup camera view
 	namedWindow(cam.wcap.c_str(), CV_WINDOW_AUTOSIZE);
