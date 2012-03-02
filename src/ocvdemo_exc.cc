@@ -155,6 +155,7 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	char buff[64]; // auxiliary text buffer
 	// The image to be displayed (by default the captured frame)
 	Mat display = cam.frame;
+	Mat roi; // A generic image ROI
 #define LINE_YSPACE 11
 #define TEXT_LINE(IMG, TXT)\
 	if ( 1 ) {\
@@ -181,6 +182,16 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 			Scalar(63,103,157),
 			CV_FILLED);
 #endif
+
+	// Render frame as thumbnail if effects are enabled
+	if (cam.effect_idx != EFF_NONE) {
+		display = cam.effects;
+		roi = display(Rect(10,10,
+			round(cam.frame.cols*0.25),
+			round(cam.frame.rows*0.25)
+		));
+		resize(cam.frame, roi, roi.size());
+	}
 
 	snprintf(buff, 64,
 		"/dev/video%d: "
