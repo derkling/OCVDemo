@@ -176,8 +176,6 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	uint16_t xthm = CAM_WIDTH(cam)  -   5;
 	uint8_t  next_line = 1; // The first test line to write
 	char buff[64]; // auxiliary text buffer
-	// The image to be displayed (by default the captured frame)
-	Mat display = cam.frame;
 	Mat roi; // A generic image ROI
 #define LINE_YSPACE 11
 #define TEXT_LINE(IMG, TXT)\
@@ -188,6 +186,9 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 		Scalar(200,200,200), 1, CV_AA);\
 	++next_line;\
 	}
+
+	// The image to be displayed (by default the captured frame)
+	display = cam.frame;
 
 #if 0
 	TEST_FONT(0, FONT_HERSHEY_SIMPLEX);

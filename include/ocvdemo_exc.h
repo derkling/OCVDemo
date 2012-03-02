@@ -85,6 +85,8 @@ private:
 #define CAM_HEIGHT(CAM) \
 	resolutions[CAM.resolution_idx].height
 
+	// The image to be displayed
+	Mat display;
 
 	RTLIB_Constraint_t cnstr;
 
