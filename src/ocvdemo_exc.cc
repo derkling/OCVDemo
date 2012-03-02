@@ -152,6 +152,7 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	uint16_t yorg = CAM_HEIGHT(cam) -  30;
 	uint16_t xend = CAM_WIDTH(cam)  -   5;
 	uint16_t yend = CAM_HEIGHT(cam) -   5;
+	uint16_t xthm = CAM_WIDTH(cam)  -   5;
 	uint8_t  next_line = 1; // The first test line to write
 	char buff[64]; // auxiliary text buffer
 	// The image to be displayed (by default the captured frame)
@@ -187,7 +188,8 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	// Render frame as thumbnail if effects are enabled
 	if (cam.effect_idx != EFF_NONE) {
 		display = cam.effects;
-		roi = display(Rect(10,10,
+		xthm -= round(cam.frame.cols*0.25);
+		roi = display(Rect(xthm, 10,
 			round(cam.frame.cols*0.25),
 			round(cam.frame.rows*0.25)
 		));
