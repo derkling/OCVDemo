@@ -20,6 +20,7 @@
 #include <bbque/utils/utility.h>
 
 #include "ocvdemo_exc.h"
+#include "buttons.h"
 
 // These are a set of useful debugging log formatters
 #define FMT_DBG(fmt) BBQUE_FMT(COLOR_LGRAY,  "TESTA_EXC  [DBG]", fmt)
@@ -40,6 +41,21 @@ const char *OCVDemo::effectStr[] = {
 	"None",
 	"Canny"
 };
+
+/*******************************************************************************
+ * Golbal GUI Elements
+ ******************************************************************************/
+
+CvButtons *buttons;
+
+bool evtExit = false;
+void on_exit(int toggle) {
+	evtExit = true;
+}
+
+/*******************************************************************************
+ * OpenCV Demo Code
+ ******************************************************************************/
 
 OCVDemo::OCVDemo(std::string const & name,
 		std::string const & recipe,
@@ -103,6 +119,11 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 
 	// Setup camera view
 	namedWindow(cam.wcap.c_str(), CV_WINDOW_AUTOSIZE);
+
+	// Create simple buttons and attach them to their callback functions
+	buttons = new CvButtons();
+	buttons->addButton(PushButton(10, 10, 110, 20, -1, "Exit", on_exit));
+	cvSetMouseCallback(cam.wcap.c_str(), cvButtonsOnMouse, buttons);
 
 	return RTLIB_OK;
 }
@@ -211,6 +232,9 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	);
 	TEXT_LINE(display, buff);
 
+	// Update buttons
+	buttons->paintButtons(display);
+
 	imshow(cam.wcap.c_str(), display);
 
 	return RTLIB_OK;
@@ -281,6 +305,10 @@ RTLIB_ExitCode_t OCVDemo::onRun() {
 
 RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	uint8_t key = (cvWaitKey(1) & 255);
+
+	// Exit when the used press the "Exit" Button
+	if (evtExit)
+		return RTLIB_EXC_WORKLOAD_NONE;
 
 	switch (key) {
 	case 27:
