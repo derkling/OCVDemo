@@ -148,13 +148,15 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	uint16_t yend = CAM_HEIGHT(cam) -   5;
 	uint8_t  next_line = 1; // The first test line to write
 	char buff[64]; // auxiliary text buffer
+	// The image to be displayed (by default the captured frame)
+	Mat display = cam.frame;
 #define LINE_YSPACE 11
-#define TEXT_LINE(TXT)\
+#define TEXT_LINE(IMG, TXT)\
 	if ( 1 ) {\
-	putText(cam.frame, TXT,\
+	putText(IMG, TXT,\
 		Point(xorg + 5, yorg + (LINE_YSPACE * next_line)),\
 		FONT_HERSHEY_COMPLEX_SMALL, 0.5,\
-		Scalar(0,0,0), 1, CV_AA);\
+		Scalar(200,200,200), 1, CV_AA);\
 	++next_line;\
 	}
 
@@ -181,17 +183,17 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 		cam.id,
 		CAM_WIDTH(cam), CAM_HEIGHT(cam), cam.fps_curr
 	);
-	TEXT_LINE(buff);
+	TEXT_LINE(display, buff);
 
 	snprintf(buff, 64,
 		"AWMs: %d,%d [cur,max] | "
 		"NONE",
 		CurrentAWM(), cnstr.awm
 	);
-	TEXT_LINE(buff);
+	TEXT_LINE(display, buff);
 
+	imshow(cam.wcap.c_str(), display);
 
-	imshow(cam.wcap.c_str(), cam.frame);
 	return RTLIB_OK;
 }
 
