@@ -134,7 +134,63 @@ RTLIB_ExitCode_t OCVDemo::getImage() {
 	return RTLIB_OK;
 }
 
+#define TEST_FONT(YPOS, TYPE)\
+	putText(cam.frame,\
+			"Test font: " #TYPE,\
+			Point(15, 15*YPOS),\
+			TYPE, 0.5,\
+			Scalar(0,0,0), 1, CV_AA);
+
 RTLIB_ExitCode_t OCVDemo::showImage() {
+	uint16_t xorg = CAM_WIDTH(cam)  - 240;
+	uint16_t yorg = CAM_HEIGHT(cam) -  30;
+	uint16_t xend = CAM_WIDTH(cam)  -   5;
+	uint16_t yend = CAM_HEIGHT(cam) -   5;
+	uint8_t  next_line = 1; // The first test line to write
+	char buff[64]; // auxiliary text buffer
+#define LINE_YSPACE 11
+#define TEXT_LINE(TXT)\
+	if ( 1 ) {\
+	putText(cam.frame, TXT,\
+		Point(xorg + 5, yorg + (LINE_YSPACE * next_line)),\
+		FONT_HERSHEY_COMPLEX_SMALL, 0.5,\
+		Scalar(0,0,0), 1, CV_AA);\
+	++next_line;\
+	}
+
+#if 0
+	TEST_FONT(0, FONT_HERSHEY_SIMPLEX);
+	TEST_FONT(1, FONT_HERSHEY_PLAIN);
+	TEST_FONT(2, FONT_HERSHEY_DUPLEX);
+	TEST_FONT(3, FONT_HERSHEY_COMPLEX);
+	TEST_FONT(4, FONT_HERSHEY_TRIPLEX);
+	TEST_FONT(5, FONT_HERSHEY_COMPLEX_SMALL);
+	TEST_FONT(6, FONT_HERSHEY_SCRIPT_SIMPLEX);
+
+	// Overlay the information box
+	rectangle(cam.frame,
+			Point(xorg, yorg),
+			Point(xend, yend),
+			Scalar(63,103,157),
+			CV_FILLED);
+#endif
+
+	snprintf(buff, 64,
+		"/dev/video%d: "
+		"%dx%d @ %5.2f [fps]",
+		cam.id,
+		CAM_WIDTH(cam), CAM_HEIGHT(cam), cam.fps_curr
+	);
+	TEXT_LINE(buff);
+
+	snprintf(buff, 64,
+		"AWMs: %d,%d [cur,max] | "
+		"NONE",
+		CurrentAWM(), cnstr.awm
+	);
+	TEXT_LINE(buff);
+
+
 	imshow(cam.wcap.c_str(), cam.frame);
 	return RTLIB_OK;
 }
