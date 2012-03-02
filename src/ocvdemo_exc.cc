@@ -253,6 +253,9 @@ void OCVDemo::IncUpperAwmID() {
 	++cnstr.awm;
 	SetConstraints(&cnstr, 1);
 
+	if (cnstr.awm <= RES_COUNT)
+		SetResolution(cnstr.awm);
+
 	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
 }
 
@@ -263,6 +266,9 @@ void OCVDemo::DecUpperAwmID() {
 
 	--cnstr.awm;
 	SetConstraints(&cnstr, 1);
+
+	if (cnstr.awm <= RES_COUNT)
+		SetResolution(cnstr.awm);
 
 	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
 }
