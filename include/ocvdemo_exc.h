@@ -40,9 +40,15 @@ public:
 
 private:
 
+	double tstart;
+
 	struct Camera {
 		uint8_t id;
 		uint8_t fps_max;
+		float fps_curr;
+		uint32_t frames_count;
+		uint32_t frames_total;
+
 		VideoCapture cap;
 		Mat frame;
 		std::string wcap;
@@ -54,6 +60,7 @@ private:
 	void DecUpperAwmID();
 	RTLIB_ExitCode_t getImage();
 	RTLIB_ExitCode_t showImage();
+	double updateFps();
 
 	RTLIB_ExitCode_t onSetup();
 	RTLIB_ExitCode_t onConfigure(uint8_t awm_id);

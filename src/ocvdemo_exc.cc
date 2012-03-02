@@ -40,6 +40,8 @@ OCVDemo::OCVDemo(std::string const & name,
 	// Keep track of the WebCam ID managed by this instance
 	cam.id = cid;
 	cam.fps_max = fps_max;
+	cam.frames_count = 0;
+	cam.frames_total = 0;
 	fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
 				cam.id, fps_max);
 
@@ -84,6 +86,10 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 	fprintf(stderr, FMT_WRN("OCVDemo::onConfigure(): "
 				"EXC [%s], AWM[%02d]\n"),
 				exc_name.c_str(), awm_id);
+
+	// Get the start processing time
+	tstart = bbque_tmr.getElapsedTimeMs();
+	cam.frames_count = 0;
 	return RTLIB_OK;
 }
 
@@ -112,11 +118,32 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 	return RTLIB_OK;
 }
 
+double OCVDemo::updateFps() {
+	static double elapsed_ms = 0; // [ms] elapsed since start
+	static double update_ms = 1000; // [s] to next console update
+	double tnow; // [s] at the call time
+
+	tnow = bbque_tmr.getElapsedTimeMs();
+	++cam.frames_count;
+	++cam.frames_total;
+
+	elapsed_ms = tnow - tstart;
+	if (elapsed_ms > update_ms) {
+		cam.fps_curr = cam.frames_count * 1000 / elapsed_ms;
+		DB(fprintf(stderr, "Processing @ FPS = %.2f\n", cam.fps_curr));
+		update_ms += 1000;
+	}
+
+	return cam.fps_curr;
+}
+
 RTLIB_ExitCode_t OCVDemo::onRun() {
 
 	// Acquired a new images
 	getImage();
 
+	// Update FPS accounting
+	updateFps();
 
 	// Show the current image
 	showImage();
