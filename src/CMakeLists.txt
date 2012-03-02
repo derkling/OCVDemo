@@ -6,7 +6,7 @@ find_package(BbqRTLib REQUIRED)
 include_directories(${BBQUE_RTLIB_INCLUDE_DIR})
 
 #----- Add "BbqRTLibTestApp" target application
-set(BBQUE_OPENCV_DEMO_SRC ocvdemo ocvdemo_exc)
+set(BBQUE_OPENCV_DEMO_SRC ocvdemo ocvdemo_exc buttons)
 add_executable(bbque-ocvdemo ${BBQUE_OPENCV_DEMO_SRC})
 
 #----- Linking dependencies
