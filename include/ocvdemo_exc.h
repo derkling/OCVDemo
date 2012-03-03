@@ -52,6 +52,7 @@ private:
 	enum EffectType {
 		EFF_NONE = 0,
 		EFF_CANNY,
+		EFF_FAST,
 		EFF_COUNT // This must be the last element
 	};
 
@@ -98,6 +99,7 @@ private:
 	double updateFps();
 
 	RTLIB_ExitCode_t doCanny();
+	RTLIB_ExitCode_t doFast();
 	RTLIB_ExitCode_t postProcess();
 
 	void Snapshot() const;

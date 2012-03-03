@@ -40,7 +40,8 @@ OCVDemo::Resolution OCVDemo::resolutions[] = {
 
 const char *OCVDemo::effectStr[] = {
 	"None",
-	"Canny"
+	"Canny",
+	"FAST"
 };
 
 /*******************************************************************************
@@ -258,6 +259,32 @@ RTLIB_ExitCode_t OCVDemo::doCanny() {
 	return RTLIB_OK;
 }
 
+RTLIB_ExitCode_t OCVDemo::doFast() {
+	// FAST Detector with (threshold = 10 and nonmax_suppression)
+	FastFeatureDetector fastd(10, true);
+	FeatureDetector* fd = &fastd;
+	std::vector<KeyPoint> keypoints;
+
+	// Get a gray image from the current frame
+	cvtColor(cam.frame, cam.effects, CV_BGR2GRAY);
+
+	// Keypoints detaction
+	fd->detect(cam.effects, keypoints);
+
+	// Ensure image is 3 channel RGB, as required for proper
+	// composition with overlay info.
+	// This allows also to draw colored cycrles for each keypoint
+	cvtColor(cam.effects, cam.effects, CV_GRAY2RGB);
+
+	//draw green circles where the keypoints are located
+	vector<KeyPoint>::const_iterator it = keypoints.begin();
+	for ( ; it != keypoints.end(); ++it) {
+		circle(cam.effects, it->pt, 4, Scalar(0,0,255,0));
+	}
+
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::postProcess() {
 
 	if (cam.effect_idx == EFF_NONE)
@@ -266,6 +293,9 @@ RTLIB_ExitCode_t OCVDemo::postProcess() {
 	switch (cam.effect_idx) {
 	case EFF_CANNY:
 		doCanny();
+		break;
+	case EFF_FAST:
+		doFast();
 		break;
 	default:
 		fprintf(stderr, "Unknowen effect required\n");
@@ -333,6 +363,10 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	case 'c':
 		fprintf(stderr, "Enable [CANNY] effect\n");
 		cam.effect_idx = EFF_CANNY;
+		break;
+	case 'f':
+		fprintf(stderr, "Enable [FAST] effect\n");
+		cam.effect_idx = EFF_FAST;
 		break;
 	case 'q':
 		fprintf(stderr, "Disable effects\n");
