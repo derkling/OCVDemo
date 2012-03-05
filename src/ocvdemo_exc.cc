@@ -146,22 +146,30 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 	// Get the start processing time
 	tstart = bbque_tmr.getElapsedTimeMs();
 	cam.frames_count = 0;
-	return RTLIB_OK;
-}
 
-
-RTLIB_ExitCode_t OCVDemo::getImage() {
-
-	// Start next frame grabbing for each camera
+	// Start next frame grabbing
 	if (!cam.cap.grab()) {
 		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
 
-	// Acquire the frame from camera
+	return RTLIB_OK;
+}
+
+
+RTLIB_ExitCode_t OCVDemo::getImage() {
+
+	// Acquire a frame from the camera
 	if (!cam.cap.retrieve(cam.frame)) {
 		fprintf(stderr, "ERROR: %s frame retriving FAILED!\n",
+				cam.wcap.c_str());
+		return RTLIB_ERROR;
+	}
+
+	// Start next frame grabbing
+	if (!cam.cap.grab()) {
+		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
