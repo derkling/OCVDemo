@@ -41,7 +41,8 @@ OCVDemo::Resolution OCVDemo::resolutions[] = {
 const char *OCVDemo::effectStr[] = {
 	"None",
 	"Canny",
-	"FAST"
+	"FAST",
+	"SURF"
 };
 
 /*******************************************************************************
@@ -293,6 +294,32 @@ RTLIB_ExitCode_t OCVDemo::doFast() {
 	return RTLIB_OK;
 }
 
+RTLIB_ExitCode_t OCVDemo::doSurf() {
+	// SURF Detector with (hessianThreshold = 400., octaves = 3, octaveLayers = 4)
+	SurfFeatureDetector surfd(400.0, 3, 4);
+	FeatureDetector* fd = &surfd;
+	std::vector<KeyPoint> keypoints;
+
+	// Get a gray image from the current frame
+	cvtColor(cam.frame, cam.effects, CV_BGR2GRAY);
+
+	// Keypoints detaction
+	fd->detect(cam.effects, keypoints);
+
+	// Ensure image is 3 channel RGB, as required for proper
+	// composition with overlay info.
+	// This allows also to draw colored cycrles for each keypoint
+	cvtColor(cam.effects, cam.effects, CV_GRAY2RGB);
+
+	//draw green circles where the keypoints are located
+	vector<KeyPoint>::const_iterator it = keypoints.begin();
+	for ( ; it != keypoints.end(); ++it) {
+		circle(cam.effects, it->pt, 4, Scalar(0,0,255,0));
+	}
+
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::postProcess() {
 
 	if (cam.effect_idx == EFF_NONE)
@@ -304,6 +331,9 @@ RTLIB_ExitCode_t OCVDemo::postProcess() {
 		break;
 	case EFF_FAST:
 		doFast();
+		break;
+	case EFF_SURF:
+		doSurf();
 		break;
 	default:
 		fprintf(stderr, "Unknowen effect required\n");
@@ -375,6 +405,10 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	case 'f':
 		fprintf(stderr, "Enable [FAST] effect\n");
 		cam.effect_idx = EFF_FAST;
+		break;
+	case 's':
+		fprintf(stderr, "Enable [SURF] effect\n");
+		cam.effect_idx = EFF_SURF;
 		break;
 	case 'q':
 		fprintf(stderr, "Disable effects\n");
