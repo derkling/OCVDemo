@@ -411,18 +411,21 @@ RTLIB_ExitCode_t OCVDemo::postProcess() {
 
 double OCVDemo::updateFps() {
 	static double elapsed_ms = 0; // [ms] elapsed since start
-	static double update_ms = 1000; // [s] to next console update
+	static double update_ms = tstart + 250.0; // [ms] to next console update
 	double tnow; // [s] at the call time
 
 	tnow = bbque_tmr.getElapsedTimeMs();
 	++cam.frames_count;
 	++cam.frames_total;
 
-	elapsed_ms = tnow - tstart;
-	if (elapsed_ms > update_ms) {
-		cam.fps_curr = cam.frames_count * 1000 / elapsed_ms;
+	if (tnow >= update_ms) {
+		elapsed_ms = tnow - tstart;
+		cam.fps_curr = cam.frames_count * 1000.0 / elapsed_ms;
 		DB(fprintf(stderr, "Processing @ FPS = %.2f\n", cam.fps_curr));
-		update_ms += 1000;
+		// Setup references for next update
+		tstart = bbque_tmr.getElapsedTimeMs();
+		update_ms = tstart + 250.0;
+		cam.frames_count = 0;
 	}
 
 	return cam.fps_curr;
