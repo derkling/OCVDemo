@@ -95,7 +95,7 @@ OCVDemo::OCVDemo(std::string const & name,
 	cnstr.awm = AWM_START_ID;
 	cnstr.operation = CONSTRAINT_ADD;
 	cnstr.type = UPPER_BOUND;
-	SetConstraints(&cnstr, 1);
+	SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
 	fprintf(stderr, FMT_INF("AWM ID init upper bound: %d\n"), cnstr.awm);
 
 }
