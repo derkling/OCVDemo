@@ -34,7 +34,9 @@ public:
 	OCVDemo(std::string const & name,
 			std::string const & recipe,
 			RTLIB_Services_t *rtlib,
-			uint8_t cid, uint8_t fps_max);
+			std::string const & video,
+			uint8_t cid,
+			uint8_t fps_max);
 
 	virtual ~OCVDemo();
 
@@ -65,6 +67,9 @@ private:
 	} resolutions[RES_COUNT];
 
 	struct Camera {
+		bool using_camera;
+#define CAMERA_SOURCE cam.using_camera
+		std::string video;
 		uint8_t id;
 		uint8_t fps_max;
 		float fps_curr;
@@ -92,9 +97,13 @@ private:
 
 	RTLIB_Constraint_t cnstr;
 
+	RTLIB_ExitCode_t SetupSourceVideo();
+	RTLIB_ExitCode_t SetupSourceCamera();
 	RTLIB_ExitCode_t SetResolution(uint8_t type);
 	void IncUpperAwmID();
 	void DecUpperAwmID();
+	RTLIB_ExitCode_t getImageFromVideo();
+	RTLIB_ExitCode_t getImageFromCamera();
 	RTLIB_ExitCode_t getImage();
 	RTLIB_ExitCode_t showImage();
 	double updateFps();

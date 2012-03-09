@@ -68,18 +68,28 @@ void on_snapshot(int toggle) {
 OCVDemo::OCVDemo(std::string const & name,
 		std::string const & recipe,
 		RTLIB_Services_t *rtlib,
+		std::string const & video,
 		uint8_t cid, uint8_t fps_max) :
 	BbqueEXC(name, recipe, rtlib) {
 
 
 	// Keep track of the WebCam ID managed by this instance
 	cam.id = cid;
+	cam.video = video;
+	cam.using_camera = true;
+	if (cam.video != "")
+		cam.using_camera = false;
 	cam.fps_max = fps_max;
 	cam.frames_count = 0;
 	cam.frames_total = 0;
 	cam.effect_idx = EFF_NONE;
-	fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
+	if (CAMERA_SOURCE) {
+		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
 				cam.id, fps_max);
+	} else {
+		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (video %s, max %d [fps]\n"),
+				cam.video.c_str(), fps_max);
+	}
 
 	// Setup default constraint
 	cnstr.awm = AWM_START_ID;
@@ -106,7 +116,23 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 	return RTLIB_OK;
 }
 
-RTLIB_ExitCode_t OCVDemo::onSetup() {
+RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
+
+	fprintf(stderr, "Opening video [%s]...\n", cam.video.c_str());
+	cam.cap = VideoCapture(cam.video);
+
+	// Check if video soure has been properly initialized
+	if (!cam.cap.isOpened()) {
+		fprintf(stderr, "ERROR: video [%s] opening FAILED!\n",
+				cam.video.c_str());
+		return RTLIB_ERROR;
+	}
+
+	cam.using_camera = false;
+	return RTLIB_OK;
+}
+
+RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 	char wcap[] = "CAM99";
 
 	// Setup camera name
@@ -116,14 +142,32 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 	// Open input device
 	fprintf(stderr, "Opening V4L2 device [/dev/video%d]...\n", cam.id);
 	cam.cap = VideoCapture(cam.id);
+
+	// Set initial camara resolution to medium
+	SetResolution(RES_MID);
+
+	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, "ERROR: %s opening FAILED!\n",
+		fprintf(stderr, "ERROR: camera [%s] opening FAILED!\n",
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
 
-	// Set initial camara resolution to medium
-	SetResolution(RES_MID);
+	cam.using_camera = true;
+	return RTLIB_OK;
+}
+
+RTLIB_ExitCode_t OCVDemo::onSetup() {
+	RTLIB_ExitCode_t result;
+
+	// Setup the required video source
+	if (CAMERA_SOURCE) {
+		result = SetupSourceCamera();
+	} else {
+		result = SetupSourceVideo();
+	}
+	if (result != RTLIB_OK)
+		return result;
 
 	// Setup camera view
 	namedWindow(cam.wcap.c_str(), CV_WINDOW_AUTOSIZE);
@@ -158,8 +202,24 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 	return RTLIB_OK;
 }
 
+RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 
-RTLIB_ExitCode_t OCVDemo::getImage() {
+	std::vector<DataMatrixCode> codes;
+	cam.cap >> cam.frame;
+	if (cam.frame.empty()) {
+		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
+				cam.wcap.c_str());
+		return RTLIB_ERROR;
+	}
+	cv::Mat gray;
+	cv::cvtColor(cam.frame, gray, CV_RGB2GRAY);
+	findDataMatrix(gray, codes);
+	drawDataMatrixCodes(codes, cam.frame);
+
+	return RTLIB_OK;
+}
+
+RTLIB_ExitCode_t OCVDemo::getImageFromCamera() {
 
 	// Acquire a frame from the camera
 	if (!cam.cap.retrieve(cam.frame)) {
@@ -176,6 +236,12 @@ RTLIB_ExitCode_t OCVDemo::getImage() {
 	}
 
 	return RTLIB_OK;
+}
+
+RTLIB_ExitCode_t OCVDemo::getImage() {
+	if (CAMERA_SOURCE)
+		return getImageFromCamera();
+	return getImageFromVideo();
 }
 
 #define TEST_FONT(YPOS, TYPE)\

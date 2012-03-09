@@ -81,6 +81,11 @@ unsigned short fps_max;
  */
 unsigned short cam_id;
 
+/**
+ * @brief The path of the .AVI video to use
+ */
+std::string video_path;
+
 void ParseCommandLine(int argc, char *argv[]) {
 	// Parse command line params
 	try {
@@ -122,7 +127,9 @@ void ParseCommandLine(int argc, char *argv[]) {
  *
  * @param name the recipe to use
  */
-pBbqueEXC_t SetupEXC(uint8_t cam_id, const char *recipe) {
+pBbqueEXC_t SetupEXC(uint8_t cam_id,
+		std::string const &video,
+		std::string const &recipe) {
 	char exc_name[] = EXC_BASENAME "_99";
 	pBbqueEXC_t pexc;
 
@@ -132,7 +139,7 @@ pBbqueEXC_t SetupEXC(uint8_t cam_id, const char *recipe) {
 	// Build a new EXC (without enabling it yet)
 	assert(rtlib);
 	pexc = pBbqueEXC_t(new OCVDemo(exc_name, recipe, rtlib,
-				cam_id, fps_max));
+				video, cam_id, fps_max));
 
 	// Saving the EXC (if registration to BBQ was successfull)
 	if (!pexc->isRegistered())
@@ -159,6 +166,9 @@ int main(int argc, char *argv[]) {
 		("cam,c", po::value<unsigned short>(&cam_id)->
 			default_value(0),
 			"the ID of the V4L2 webcam to use")
+		("input,i", po::value<std::string>(&video_path)->
+			default_value(""),
+			"the path of the .AVI video to use")
 		("fps_max,f", po::value<unsigned short>(&fps_max)->
 			default_value(15),
 			"the maximum framerate to operate the webcam")
@@ -176,7 +186,7 @@ int main(int argc, char *argv[]) {
 	assert(rtlib);
 
 	// Configuring required Execution Contexts
-	pexc = SetupEXC(cam_id, recipe.c_str());
+	pexc = SetupEXC(cam_id, video_path, recipe);
 	if (!pexc)
 		return EXIT_FAILURE;
 
