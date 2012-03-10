@@ -109,6 +109,8 @@ private:
 
 	RTLIB_ExitCode_t SetupSourceVideo();
 	RTLIB_ExitCode_t SetupSourceCamera();
+
+	RTLIB_ExitCode_t SetResolutionCamera(uint8_t type);
 	RTLIB_ExitCode_t SetResolution(uint8_t type);
 	void IncUpperAwmID();
 	void DecUpperAwmID();

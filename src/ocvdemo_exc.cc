@@ -104,6 +104,23 @@ OCVDemo::~OCVDemo() {
 
 }
 
+
+RTLIB_ExitCode_t OCVDemo::SetResolutionCamera(uint8_t type) {
+
+	fprintf(stderr, "Setup camera resolution: [%d x %d]...\n",
+			CAM_PRESET_WIDTH(type), CAM_PRESET_HEIGHT(type));
+
+	cam.cap.set(CV_CAP_PROP_FRAME_WIDTH, CAM_PRESET_WIDTH(type));
+	cam.cap.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_PRESET_HEIGHT(type));
+
+	// Keep track of current camera resolution
+	cam.cur_res.width = CAM_PRESET_WIDTH(type);
+	cam.cur_res.height = CAM_PRESET_HEIGHT(type);
+
+	cam.reduce_fct = 1.00;
+
+	return RTLIB_OK;
+}
 RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 	if (type >= RES_COUNT)
 		return RTLIB_ERROR;
