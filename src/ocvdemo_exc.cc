@@ -281,12 +281,13 @@ RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 
 	// Scaled down the frame (if required)
 	if (cam.reduce_fct < 1.0) {
-		cam.cap >> frame;
+		if (!cam.cap.read(frame))
+			goto exit_eof;
 		resize(frame, cam.frame,
 				Size(round(frame.cols * cam.reduce_fct),
 					round(frame.rows * cam.reduce_fct)));
-	} else {
-		cam.cap >> cam.frame;
+	} else if (!cam.cap.read(cam.frame)) {
+			goto exit_eof;
 	}
 	if (cam.frame.empty()) {
 		fprintf(stderr, "ERROR: video frame grabbing FAILED!\n");
@@ -294,6 +295,10 @@ RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 	}
 
 	return RTLIB_OK;
+
+exit_eof:
+	return RTLIB_EXC_WORKLOAD_NONE;
+
 }
 
 RTLIB_ExitCode_t OCVDemo::getImageFromCamera() {
@@ -508,9 +513,12 @@ double OCVDemo::updateFps() {
 }
 
 RTLIB_ExitCode_t OCVDemo::onRun() {
+	RTLIB_ExitCode_t result;
 
 	// Acquired a new images
-	getImage();
+	result = getImage();
+	if (result != RTLIB_OK)
+		return result;
 
 	// Apply required effects
 	postProcess();
