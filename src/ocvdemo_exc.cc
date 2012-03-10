@@ -117,6 +117,7 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 }
 
 RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
+	Mat frame;
 
 	fprintf(stderr, "Opening video [%s]...\n", cam.video.c_str());
 	cam.cap = VideoCapture(cam.video);
@@ -125,6 +126,21 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	if (!cam.cap.isOpened()) {
 		fprintf(stderr, "ERROR: video [%s] opening FAILED!\n",
 				cam.video.c_str());
+		return RTLIB_ERROR;
+	}
+
+	// Get first frame which is used to read the native resolution
+	cam.cap >> frame;
+	if (frame.empty()) {
+		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
+				cam.wcap.c_str());
+		return RTLIB_ERROR;
+	}
+
+	// Setup maximum (native) resoulution
+	cam.max_res.width = frame.cols;
+	cam.max_res.height = frame.rows;
+	if (!cam.max_res.width || !cam.max_res.height) {
 		return RTLIB_ERROR;
 	}
 
@@ -152,6 +168,10 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
+
+	// Setup maximum (native) resoulution
+	cam.max_res.width = CAM_PRESET_WIDTH(RES_HIG);
+	cam.max_res.height = CAM_PRESET_HEIGHT(RES_HIG);
 
 	cam.using_camera = true;
 	return RTLIB_OK;

@@ -50,6 +50,11 @@ private:
 		RES_HIG,
 		RES_COUNT // This must be the last element
 	};
+#define CAM_PRESET_WIDTH(TYPE) \
+	resolutions[TYPE].width
+#define CAM_PRESET_HEIGHT(TYPE) \
+	resolutions[TYPE].height
+
 
 	enum EffectType {
 		EFF_NONE = 0,
@@ -82,6 +87,8 @@ private:
 
 		// Current camera resolution
 		uint8_t resolution_idx;
+		Resolution max_res;
+		Resolution cur_res;
 
 		// The effect to apply at the image
 		uint8_t effect_idx;
