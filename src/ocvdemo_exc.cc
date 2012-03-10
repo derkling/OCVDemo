@@ -121,6 +121,29 @@ RTLIB_ExitCode_t OCVDemo::SetResolutionCamera(uint8_t type) {
 
 	return RTLIB_OK;
 }
+
+RTLIB_ExitCode_t OCVDemo::SetResolutionVideo(uint8_t type) {
+
+	// Video source resolution is changed at frame acquisition time
+	// Once this method is called, just setup the required actual sizes
+	switch (type) {
+	case RES_LOW:
+		cam.reduce_fct = 0.33;
+		break;
+	case RES_MID:
+		cam.reduce_fct = 0.66;
+		break;
+	default:
+		cam.reduce_fct = 1.00;
+	}
+
+	// Keep track of current camera resolution
+	cam.cur_res.width = round(cam.max_res.width * cam.reduce_fct);
+	cam.cur_res.height = round(cam.max_res.height * cam.reduce_fct);
+
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 	if (type >= RES_COUNT)
 		return RTLIB_ERROR;
