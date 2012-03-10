@@ -199,9 +199,6 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 	fprintf(stderr, "Opening V4L2 device [/dev/video%d]...\n", cam.id);
 	cam.cap = VideoCapture(cam.id);
 
-	// Set initial camara resolution to medium
-	SetResolution(RES_MID);
-
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
 		fprintf(stderr, "ERROR: camera [%s] opening FAILED!\n",
@@ -228,6 +225,12 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 	}
 	if (result != RTLIB_OK)
 		return result;
+
+	fprintf(stderr, "Max (native) resolution: [%d x %d]\n",
+			cam.max_res.width, cam.max_res.height);
+
+	// Setup initial resolution to medium
+	SetResolution(RES_MID);
 
 	// Setup camera view
 	namedWindow(cam.wcap.c_str(), CV_WINDOW_AUTOSIZE);
