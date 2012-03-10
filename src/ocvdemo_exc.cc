@@ -174,7 +174,7 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, "ERROR: video [%s] opening FAILED!\n",
+		fprintf(stderr, "ERROR: opening video [%s] FAILED!\n",
 				cam.video.c_str());
 		return RTLIB_ERROR;
 	}
@@ -211,7 +211,7 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, "ERROR: camera [%s] opening FAILED!\n",
+		fprintf(stderr, "ERROR: opening camera [%s] FAILED!\n",
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -395,7 +395,6 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 
 	// Update buttons
 	buttons->paintButtons(display);
-
 	imshow(cam.wcap.c_str(), display);
 
 	return RTLIB_OK;
