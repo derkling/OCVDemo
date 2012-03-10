@@ -88,9 +88,9 @@ private:
 		Mat effects;
 	} cam;
 #define CAM_WIDTH(CAM) \
-	resolutions[CAM.resolution_idx].width
+	CAM.frame.cols
 #define CAM_HEIGHT(CAM) \
-	resolutions[CAM.resolution_idx].height
+	CAM.frame.rows
 
 	// The image to be displayed
 	Mat display;
