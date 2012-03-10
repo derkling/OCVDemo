@@ -90,6 +90,9 @@ private:
 		Resolution max_res;
 		Resolution cur_res;
 
+		// Image scaling down factor (if less than 1.0)
+		float reduce_fct;
+
 		// The effect to apply at the image
 		uint8_t effect_idx;
 		Mat effects;

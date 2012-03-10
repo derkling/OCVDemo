@@ -223,12 +223,20 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 }
 
 RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
-
 	std::vector<DataMatrixCode> codes;
-	cam.cap >> cam.frame;
+	Mat frame;
+
+	// Scaled down the frame (if required)
+	if (cam.reduce_fct < 1.0) {
+		cam.cap >> frame;
+		resize(frame, cam.frame,
+				Size(round(frame.cols * cam.reduce_fct),
+					round(frame.rows * cam.reduce_fct)));
+	} else {
+		cam.cap >> cam.frame;
+	}
 	if (cam.frame.empty()) {
-		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
-				cam.wcap.c_str());
+		fprintf(stderr, "ERROR: video frame grabbing FAILED!\n");
 		return RTLIB_ERROR;
 	}
 
