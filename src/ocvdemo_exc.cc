@@ -211,10 +211,6 @@ RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
-	cv::Mat gray;
-	cv::cvtColor(cam.frame, gray, CV_RGB2GRAY);
-	findDataMatrix(gray, codes);
-	drawDataMatrixCodes(codes, cam.frame);
 
 	return RTLIB_OK;
 }
