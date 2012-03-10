@@ -145,15 +145,25 @@ RTLIB_ExitCode_t OCVDemo::SetResolutionVideo(uint8_t type) {
 }
 
 RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
+	RTLIB_ExitCode_t result = RTLIB_OK;
+
 	if (type >= RES_COUNT)
 		return RTLIB_ERROR;
 
-	cam.resolution_idx = type;
-	cam.cap.set(CV_CAP_PROP_FRAME_WIDTH,  CAM_WIDTH(cam));
-	cam.cap.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT(cam));
-	fprintf(stderr, "Set camera resolution: %d x %d\n",
+	if (CAMERA_SOURCE) {
+		result = SetResolutionCamera(type);
+	} else {
+		result = SetResolutionVideo(type);
+	}
+	if (result != RTLIB_OK) {
+		return result;
+	}
+
+	fprintf(stderr, "Current resolution: [%d x %d]...\n",
 			CAM_WIDTH(cam), CAM_HEIGHT(cam));
-	return RTLIB_OK;
+
+	return result;
+
 }
 
 RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {

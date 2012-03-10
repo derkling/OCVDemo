@@ -86,7 +86,6 @@ private:
 		std::string wcap;
 
 		// Current camera resolution
-		uint8_t resolution_idx;
 		Resolution max_res;
 		Resolution cur_res;
 
