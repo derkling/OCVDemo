@@ -121,6 +121,7 @@ private:
 	RTLIB_ExitCode_t getImage();
 	RTLIB_ExitCode_t showImage();
 	double updateFps();
+	void forceFps();
 
 	RTLIB_ExitCode_t doCanny();
 	RTLIB_ExitCode_t doFast();

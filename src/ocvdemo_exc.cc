@@ -517,6 +517,40 @@ double OCVDemo::updateFps() {
 	return cam.fps_cur;
 }
 
+void OCVDemo::forceFps() {
+	static double tstart = 0; // [ms] at the cycle start time
+	float delay_ms = 0; // [ms] delay to stick with the required FPS
+	uint32_t sleep_us;
+	float cycle_time;
+	float expec_time;
+	double tnow; // [s] at the call time
+
+	if (unlikely(tstart == 0)) {
+		// The first frame is used to setup the start time
+		tstart = bbque_tmr.getElapsedTimeMs();
+		return;
+	}
+
+	tnow = bbque_tmr.getElapsedTimeMs();
+//	fprintf(stderr, FMT_INF("TP: %.4f, TN: %.4f\n"),
+//			tstart, tnow);
+
+	cycle_time = tnow - tstart;
+	expec_time = static_cast<float>(1e3) / cam.fps_max;
+	delay_ms = expec_time - cycle_time;
+	sleep_us = 1e3 * static_cast<uint32_t>(delay_ms);
+
+	if (cycle_time < expec_time) {
+		DB(fprintf(stderr, FMT_INF("Cycle Time: %3.3f[ms], ET: %3.3f[ms], "
+						"Sleep time %u [us]\n"),
+			cycle_time, expec_time, sleep_us));
+		usleep(sleep_us);
+	}
+
+	// Update the start time of the next cycle
+	tstart = bbque_tmr.getElapsedTimeMs();
+}
+
 RTLIB_ExitCode_t OCVDemo::onRun() {
 	RTLIB_ExitCode_t result;
 
@@ -533,6 +567,9 @@ RTLIB_ExitCode_t OCVDemo::onRun() {
 
 	// Show the current image
 	showImage();
+
+	// Pad cycle time to force the maximum required framerate
+	forceFps();
 
 	return RTLIB_OK;
 }
