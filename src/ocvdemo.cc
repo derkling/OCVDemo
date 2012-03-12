@@ -77,6 +77,14 @@ std::string recipe;
 unsigned short fps_max;
 
 /**
+ * @brief The maximum number of frames
+ *
+ * This is used to identify the maximum number of frames to decode, in case the
+ * input video has more then this number. If "0" all frames must be decoded.
+ */
+unsigned num_frames;
+
+/**
  * @brief The ID of the V4L2 controlled webcam
  */
 unsigned short cam_id;
@@ -139,7 +147,7 @@ pBbqueEXC_t SetupEXC(uint8_t cam_id,
 	// Build a new EXC (without enabling it yet)
 	assert(rtlib);
 	pexc = pBbqueEXC_t(new OCVDemo(exc_name, recipe, rtlib,
-				video, cam_id, fps_max));
+				video, cam_id, fps_max, num_frames));
 
 	// Saving the EXC (if registration to BBQ was successfull)
 	if (!pexc->isRegistered())
@@ -170,8 +178,11 @@ int main(int argc, char *argv[]) {
 			default_value(""),
 			"the path of the .AVI video to use")
 		("fps_max,f", po::value<unsigned short>(&fps_max)->
-			default_value(15),
-			"the maximum framerate to operate the webcam")
+			default_value(25),
+			"the maximum framerate required")
+		("num,n", po::value<unsigned>(&num_frames)->
+			default_value(0),
+			"the maximum number of frames to decode")
 	;
 
 	ParseCommandLine(argc, argv);

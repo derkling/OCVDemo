@@ -69,7 +69,8 @@ OCVDemo::OCVDemo(std::string const & name,
 		std::string const & recipe,
 		RTLIB_Services_t *rtlib,
 		std::string const & video,
-		uint8_t cid, uint8_t fps_max) :
+		uint8_t cid, uint8_t fps_max,
+		uint32_t frames_max) :
 	BbqueEXC(name, recipe, rtlib) {
 
 
@@ -82,6 +83,7 @@ OCVDemo::OCVDemo(std::string const & name,
 	cam.fps_max = fps_max;
 	cam.frames_count = 0;
 	cam.frames_total = 0;
+	cam.frames_max = frames_max;
 	cam.effect_idx = EFF_NONE;
 	if (CAMERA_SOURCE) {
 		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
@@ -89,6 +91,9 @@ OCVDemo::OCVDemo(std::string const & name,
 	} else {
 		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (video %s, max %d [fps]\n"),
 				cam.video.c_str(), fps_max);
+	}
+	if (cam.frames_max) {
+		fprintf(stderr, FMT_WRN("Decoding up-to %d frames\n"), cam.frames_max);
 	}
 
 	// Setup default constraint
@@ -534,6 +539,11 @@ RTLIB_ExitCode_t OCVDemo::onRun() {
 
 RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	uint8_t key = (cvWaitKey(1) & 255);
+
+	// Exit if we decoded the required amount of frames
+	if (cam.frames_max &&
+		cam.frames_total == cam.frames_max)
+		return RTLIB_EXC_WORKLOAD_NONE;
 
 	// Exit when the used press the "Exit" Button
 	if (evtExit)

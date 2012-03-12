@@ -36,7 +36,8 @@ public:
 			RTLIB_Services_t *rtlib,
 			std::string const & video,
 			uint8_t cid,
-			uint8_t fps_max);
+			uint8_t fps_max,
+			uint32_t frames_max);
 
 	virtual ~OCVDemo();
 
@@ -80,6 +81,7 @@ private:
 		float fps_curr;
 		uint32_t frames_count;
 		uint32_t frames_total;
+		uint32_t frames_max;
 
 		VideoCapture cap;
 		Mat frame;
