@@ -78,7 +78,7 @@ private:
 		std::string video;
 		uint8_t id;
 		uint8_t fps_max;
-		float fps_curr;
+		float fps_cur;
 		uint32_t frames_count;
 		uint32_t frames_total;
 		uint32_t frames_max;

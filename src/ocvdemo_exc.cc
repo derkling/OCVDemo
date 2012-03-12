@@ -87,10 +87,10 @@ OCVDemo::OCVDemo(std::string const & name,
 	cam.effect_idx = EFF_NONE;
 	if (CAMERA_SOURCE) {
 		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
-				cam.id, fps_max);
+				cam.id, cam.fps_max);
 	} else {
 		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (video %s, max %d [fps]\n"),
-				cam.video.c_str(), fps_max);
+				cam.video.c_str(), cam.fps_max);
 	}
 	if (cam.frames_max) {
 		fprintf(stderr, FMT_WRN("Decoding up-to %d frames\n"), cam.frames_max);
@@ -392,7 +392,7 @@ RTLIB_ExitCode_t OCVDemo::showImage() {
 		"/dev/video%d: "
 		"%dx%d @ %5.2f [fps]",
 		cam.id,
-		CAM_WIDTH(cam), CAM_HEIGHT(cam), cam.fps_curr
+		CAM_WIDTH(cam), CAM_HEIGHT(cam), cam.fps_cur
 	);
 	TEXT_LINE(display, buff);
 
@@ -506,15 +506,15 @@ double OCVDemo::updateFps() {
 
 	if (tnow >= update_ms) {
 		elapsed_ms = tnow - tstart;
-		cam.fps_curr = cam.frames_count * 1000.0 / elapsed_ms;
-		DB(fprintf(stderr, "Processing @ FPS = %.2f\n", cam.fps_curr));
+		cam.fps_cur = cam.frames_count * 1000.0 / elapsed_ms;
+		DB(fprintf(stderr, FMT_DBG("Processing @ FPS = %.2f\n"), cam.fps_cur));
 		// Setup references for next update
 		tstart = bbque_tmr.getElapsedTimeMs();
 		update_ms = tstart + 250.0;
 		cam.frames_count = 0;
 	}
 
-	return cam.fps_curr;
+	return cam.fps_cur;
 }
 
 RTLIB_ExitCode_t OCVDemo::onRun() {
