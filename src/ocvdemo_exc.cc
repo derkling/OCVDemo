@@ -602,10 +602,10 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	case 27:
 		return RTLIB_EXC_WORKLOAD_NONE;
 	case '+':
-		IncUpperAwmID();
+		ResolutionUp();
 		break;
 	case '-':
-		DecUpperAwmID();
+		ResolutionDown();
 		break;
 	case 'c':
 		fprintf(stderr, "Enable [CANNY] effect\n");
