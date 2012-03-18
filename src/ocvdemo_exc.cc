@@ -605,6 +605,9 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	// New adjustment time
 	tprv = tnow;
 
+	fprintf(stderr, FMT_INF("AWM [%d], FPS deviation: %5.1f[%%]\r"),
+				CurrentAWM(), (cam.fps_dev - 1)* 100);
+
 	// Check if the current FPS is at least 80% of the required FPS
 	if (cam.fps_dev >= 0.85) {
 		napped = false;
@@ -613,19 +616,15 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 		return RTLIB_OK;
 	}
 
-	// Critical framerate deviation: increasing check frequency
-	fprintf(stderr, FMT_INF("framerate deviation: %5.1f[%%]\r"),
-			(1 - cam.fps_dev) * 100);
+	// Here we are at leat 20% under the required framerate
 	tcheck = 1000;
 
-
-	// Here we are at leat 20% under the required framerate
 
 	// Effects disabled: scale-down on under FPS
 	if (cam.effect_idx == EFF_NONE) {
 		scaling = ResolutionDown();
 		if (scaling)
-			fprintf(stderr, FMT_INF("Under framerate %.1f[%%]\n"),
+			fprintf(stderr, FMT_INF("\nUnder framerate %.1f[%%]\n"),
 					cam.fps_dev * 100);
 		return RTLIB_OK;
 	}
@@ -635,7 +634,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 		// NAP request timedout: reducing resolution
 		scaling = ResolutionDown();
 		if (scaling)
-			fprintf(stderr, FMT_INF("NAP timeout: downscaling\n"));
+			fprintf(stderr, FMT_INF("\nNAP timeout: downscaling\n"));
 		napped = false;
 		return RTLIB_OK;
 	}
@@ -647,7 +646,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 
 	// NAP not asserted: asserting a new one
 	nap = (static_cast<uint8_t>((1 - cam.fps_dev) * 100) % 100);
-	fprintf(stderr, FMT_INF("NAP assert [%d]\n"), nap);
+	fprintf(stderr, FMT_INF("\nNAP assert [%d]\n"), nap);
 	SetGoalGap(nap);
 	napped = true;
 
