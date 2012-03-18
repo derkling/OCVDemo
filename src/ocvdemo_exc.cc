@@ -549,6 +549,9 @@ void OCVDemo::forceFps() {
 	delay_ms = expec_time - cycle_time;
 	sleep_us = 1e3 * static_cast<uint32_t>(delay_ms);
 
+	// Keep track of the framerate deviation
+	cam.fps_dev = expec_time / cycle_time;
+
 	if (cycle_time < expec_time) {
 		DB(fprintf(stderr, FMT_INF("Cycle Time: %3.3f[ms], ET: %3.3f[ms], "
 						"Sleep time %u [us]\n"),

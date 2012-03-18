@@ -80,6 +80,7 @@ private:
 		uint8_t id;
 		uint8_t fps_max;
 		float fps_cur;
+		float fps_dev;
 		uint32_t frames_count;
 		uint32_t frames_total;
 		uint32_t frames_max;
