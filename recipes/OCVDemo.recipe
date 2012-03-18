@@ -7,8 +7,8 @@
 					<resources>
 						<tile id="0">
 							<cluster id="0">
-								<pe qty="50"/>
-								<mem units="Mb" qty="5"/>
+								<pe qty="12"/>
+								<mem units="Mb" qty="60"/>
 							</cluster>
 						</tile>
 					</resources>
@@ -17,8 +17,8 @@
 					<resources>
 						<tile id="0">
 							<cluster id="0">
-								<pe qty="100"/>
-								<mem units="Mb" qty="10"/>
+								<pe qty="25"/>
+								<mem units="Mb" qty="100"/>
 							</cluster>
 						</tile>
 					</resources>
@@ -27,8 +27,8 @@
 					<resources>
 						<tile id="0">
 							<cluster id="0">
-								<pe qty="200"/>
-								<mem units="Mb" qty="10"/>
+								<pe qty="50"/>
+								<mem units="Mb" qty="160"/>
 							</cluster>
 						</tile>
 					</resources>
