@@ -628,35 +628,6 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	return RTLIB_OK;
 }
 
-void OCVDemo::IncUpperAwmID() {
-
-	if (cnstr.awm == AWM_UPPER_ID)
-		return;
-
-	++cnstr.awm;
-	SetConstraints(&cnstr, 1);
-
-	if (cnstr.awm <= RES_COUNT)
-		SetResolution(cnstr.awm);
-
-	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
-}
-
-void OCVDemo::DecUpperAwmID() {
-
-	if (cnstr.awm == 0)
-		return;
-
-	--cnstr.awm;
-	SetConstraints(&cnstr, 1);
-
-	if (cnstr.awm <= RES_COUNT)
-		SetResolution(cnstr.awm);
-
-	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
-}
-
-
 bool OCVDemo::ResolutionUp() {
 
 	if (cam.res_id == RES_HIG)

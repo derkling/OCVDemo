@@ -118,8 +118,6 @@ private:
 	RTLIB_ExitCode_t SetResolutionVideo(uint8_t type);
 	RTLIB_ExitCode_t SetResolutionCamera(uint8_t type);
 	RTLIB_ExitCode_t SetResolution(uint8_t type);
-	void IncUpperAwmID();
-	void DecUpperAwmID();
 	bool ResolutionUp();
 	bool ResolutionDown();
 	RTLIB_ExitCode_t getImageFromVideo();
