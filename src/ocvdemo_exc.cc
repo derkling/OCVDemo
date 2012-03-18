@@ -103,11 +103,11 @@ OCVDemo::OCVDemo(std::string const & name,
 	}
 
 	// Setup default constraint
-	cnstr.awm = AWM_START_ID;
 	cnstr.operation = CONSTRAINT_ADD;
 	cnstr.type = UPPER_BOUND;
+	cnstr.awm = 1;
 	SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
-	fprintf(stderr, FMT_INF("AWM ID init upper bound: %d\n"), cnstr.awm);
+	fprintf(stderr, FMT_INF("Init AWM ID upper bound: %d\n"), cnstr.awm);
 
 }
 
@@ -692,6 +692,15 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	case 'q':
 		fprintf(stderr, FMT_INF("Disable effects\n"));
 		cam.effect_idx = EFF_NONE;
+
+		if (cnstr.awm < 2)
+			break;
+
+		// Release the AWM upper-bound
+		cnstr.awm = 1;
+		SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
+		fprintf(stderr, FMT_INF("Lower AWM upper bound: %d\n"), cnstr.awm);
+
 		break;
 	}
 
