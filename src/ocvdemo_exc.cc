@@ -38,6 +38,12 @@ OCVDemo::Resolution OCVDemo::resolutions[] = {
 	{1280, 1024}
 };
 
+const char *OCVDemo::resolutionStr[] = {
+	"LOW",
+	"MID",
+	"HIG"
+};
+
 const char *OCVDemo::effectStr[] = {
 	"None",
 	"Canny",
@@ -164,7 +170,10 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 		return result;
 	}
 
-	fprintf(stderr, "Current resolution: [%d x %d]...\n",
+	// Keep track of current camera resolution
+	cam.res_id = type;
+	fprintf(stderr, "Current resolution %s: [%d x %d]...\n",
+			resolutionStr[cam.res_id],
 			CAM_WIDTH(cam), CAM_HEIGHT(cam));
 
 	return result;
@@ -647,6 +656,28 @@ void OCVDemo::DecUpperAwmID() {
 	fprintf(stderr, FMT_INF("Enabled AWM: [0, %d]\n"), cnstr.awm);
 }
 
+
+bool OCVDemo::ResolutionUp() {
+
+	if (cam.res_id == RES_HIG)
+		return false;
+
+	fprintf(stderr, FMT_INF("Resolution Scale UP\n"));
+	++cam.res_id;
+	SetResolution(cam.res_id);
+	return true;
+}
+
+bool OCVDemo::ResolutionDown() {
+
+	if (cam.res_id == RES_LOW)
+		return false;
+
+	fprintf(stderr, FMT_INF("Resolution Scale DOWN\n"));
+	--cam.res_id;
+	SetResolution(cam.res_id);
+	return true;
+}
 
 void OCVDemo::Snapshot() const {
 	time_t ltime = time(NULL);

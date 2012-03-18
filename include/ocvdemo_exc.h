@@ -56,6 +56,7 @@ private:
 #define CAM_PRESET_HEIGHT(TYPE) \
 	resolutions[TYPE].height
 
+	static const char *resolutionStr[RES_COUNT];
 
 	enum EffectType {
 		EFF_NONE = 0,
@@ -96,6 +97,9 @@ private:
 
 		// The effect to apply at the image
 		uint8_t effect_idx;
+
+		// Resolution ID
+		uint8_t res_id;
 		Mat effects;
 	} cam;
 #define CAM_WIDTH(CAM) \
@@ -116,6 +120,8 @@ private:
 	RTLIB_ExitCode_t SetResolution(uint8_t type);
 	void IncUpperAwmID();
 	void DecUpperAwmID();
+	bool ResolutionUp();
+	bool ResolutionDown();
 	RTLIB_ExitCode_t getImageFromVideo();
 	RTLIB_ExitCode_t getImageFromCamera();
 	RTLIB_ExitCode_t getImage();
