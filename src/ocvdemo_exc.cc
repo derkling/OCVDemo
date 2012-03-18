@@ -118,7 +118,7 @@ OCVDemo::~OCVDemo() {
 
 RTLIB_ExitCode_t OCVDemo::SetResolutionCamera(uint8_t type) {
 
-	fprintf(stderr, "Setup camera resolution: [%d x %d]...\n",
+	fprintf(stderr, FMT_INF("Setup camera resolution: [%d x %d]...\n"),
 			CAM_PRESET_WIDTH(type), CAM_PRESET_HEIGHT(type));
 
 	cam.cap.set(CV_CAP_PROP_FRAME_WIDTH, CAM_PRESET_WIDTH(type));
@@ -172,7 +172,7 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 
 	// Keep track of current camera resolution
 	cam.res_id = type;
-	fprintf(stderr, "Current resolution %s: [%d x %d]...\n",
+	fprintf(stderr, FMT_DBG("Current resolution %s: [%d x %d]...\n"),
 			resolutionStr[cam.res_id],
 			CAM_WIDTH(cam), CAM_HEIGHT(cam));
 
@@ -183,12 +183,12 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	Mat frame;
 
-	fprintf(stderr, "Opening video [%s]...\n", cam.video.c_str());
+	fprintf(stderr, FMT_INF("Opening video [%s]...\n"), cam.video.c_str());
 	cam.cap = VideoCapture(cam.video);
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, "ERROR: opening video [%s] FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: opening video [%s] FAILED!\n"),
 				cam.video.c_str());
 		return RTLIB_ERROR;
 	}
@@ -196,7 +196,7 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	// Get first frame which is used to read the native resolution
 	cam.cap >> frame;
 	if (frame.empty()) {
-		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -220,12 +220,12 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 	cam.wcap = std::string(wcap);
 
 	// Open input device
-	fprintf(stderr, "Opening V4L2 device [/dev/video%d]...\n", cam.id);
+	fprintf(stderr, FMT_INF("Opening V4L2 device [/dev/video%d]...\n"), cam.id);
 	cam.cap = VideoCapture(cam.id);
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, "ERROR: opening camera [%s] FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: opening camera [%s] FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -250,7 +250,7 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 	if (result != RTLIB_OK)
 		return result;
 
-	fprintf(stderr, "Max (native) resolution: [%d x %d]\n",
+	fprintf(stderr, FMT_INF("Max (native) resolution: [%d x %d]\n"),
 			cam.max_res.width, cam.max_res.height);
 
 	// Setup initial resolution to medium
@@ -281,7 +281,7 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 
 	// Start next frame grabbing
 	if (!cam.cap.grab()) {
-		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -304,7 +304,7 @@ RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 			goto exit_eof;
 	}
 	if (cam.frame.empty()) {
-		fprintf(stderr, "ERROR: video frame grabbing FAILED!\n");
+		fprintf(stderr, FMT_ERR("ERROR: video frame grabbing FAILED!\n"));
 		return RTLIB_ERROR;
 	}
 
@@ -319,14 +319,14 @@ RTLIB_ExitCode_t OCVDemo::getImageFromCamera() {
 
 	// Acquire a frame from the camera
 	if (!cam.cap.retrieve(cam.frame)) {
-		fprintf(stderr, "ERROR: %s frame retriving FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: %s frame retriving FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
 
 	// Start next frame grabbing
 	if (!cam.cap.grab()) {
-		fprintf(stderr, "ERROR: %s frame grabbing FAILED!\n",
+		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -497,7 +497,7 @@ RTLIB_ExitCode_t OCVDemo::postProcess() {
 		doSurf();
 		break;
 	default:
-		fprintf(stderr, "Unknowen effect required\n");
+		fprintf(stderr, FMT_WRN("Unknowen effect required\n"));
 		return RTLIB_ERROR;
 	}
 
@@ -641,7 +641,8 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	}
 
 	// Avoid NAPs if we are already at the maximum AWM
-	if (CurrentAWM() == 2)
+	if (CurrentAWM() == 2) {
+		fprintf(stderr, "\n");
 		return RTLIB_OK;
 
 	// NAP not asserted: asserting a new one
@@ -678,19 +679,19 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		ResolutionDown();
 		break;
 	case 'c':
-		fprintf(stderr, "Enable [CANNY] effect\n");
+		fprintf(stderr, FMT_INF("Enable [CANNY] effect\n"));
 		cam.effect_idx = EFF_CANNY;
 		break;
 	case 'f':
-		fprintf(stderr, "Enable [FAST] effect\n");
+		fprintf(stderr, FMT_INF("Enable [FAST] effect\n"));
 		cam.effect_idx = EFF_FAST;
 		break;
 	case 's':
-		fprintf(stderr, "Enable [SURF] effect\n");
+		fprintf(stderr, FMT_INF("Enable [SURF] effect\n"));
 		cam.effect_idx = EFF_SURF;
 		break;
 	case 'q':
-		fprintf(stderr, "Disable effects\n");
+		fprintf(stderr, FMT_INF("Disable effects\n"));
 		cam.effect_idx = EFF_NONE;
 		break;
 	}
