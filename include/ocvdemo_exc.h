@@ -135,6 +135,8 @@ private:
 
 	void Snapshot() const;
 
+	RTLIB_ExitCode_t FrameratePolicy();
+
 	RTLIB_ExitCode_t onSetup();
 	RTLIB_ExitCode_t onConfigure(uint8_t awm_id);
 	RTLIB_ExitCode_t onRun();

@@ -586,6 +586,73 @@ RTLIB_ExitCode_t OCVDemo::onRun() {
 	return RTLIB_OK;
 }
 
+RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
+	static bool napped = false;
+	static uint16_t tcheck = 1000;
+	static uint8_t urc = 0;
+	static double tprv = 0;
+	bool scaling = false;
+	double tdif;
+	double tnow;
+	uint8_t nap;
+
+	// Avoid adjustments more frequent than once every 5[s]
+	tnow = bbque_tmr.getElapsedTimeMs();
+	tdif = tnow - tprv;
+	if (tdif < tcheck)
+		return RTLIB_OK;
+
+	// New adjustment time
+	tprv = tnow;
+
+	// Check if the current FPS is at least 80% of the required FPS
+	if (cam.fps_dev >= 0.85) {
+		napped = false;
+		tcheck = 1000;
+		urc = 4;
+		return RTLIB_OK;
+	}
+
+	// Critical framerate deviation: increasing check frequency
+	fprintf(stderr, FMT_INF("framerate deviation: %5.1f[%%]\r"),
+			(1 - cam.fps_dev) * 100);
+	tcheck = 1000;
+
+
+	// Here we are at leat 20% under the required framerate
+
+	// Effects disabled: scale-down on under FPS
+	if (cam.effect_idx == EFF_NONE) {
+		scaling = ResolutionDown();
+		if (scaling)
+			fprintf(stderr, FMT_INF("Under framerate %.1f[%%]\n"),
+					cam.fps_dev * 100);
+		return RTLIB_OK;
+	}
+
+	// Effect enabled: ask for more resources (if not already done)
+	if (napped) {
+		// NAP request timedout: reducing resolution
+		scaling = ResolutionDown();
+		if (scaling)
+			fprintf(stderr, FMT_INF("NAP timeout: downscaling\n"));
+		napped = false;
+		return RTLIB_OK;
+	}
+
+	// Avoid NAPs if we are already at the maximum AWM
+	if (CurrentAWM() == 2)
+		return RTLIB_OK;
+
+	// NAP not asserted: asserting a new one
+	nap = (static_cast<uint8_t>((1 - cam.fps_dev) * 100) % 100);
+	fprintf(stderr, FMT_INF("NAP assert [%d]\n"), nap);
+	SetGoalGap(nap);
+	napped = true;
+
+	return RTLIB_OK;
+}
+
 RTLIB_ExitCode_t OCVDemo::onMonitor() {
 	uint8_t key = (cvWaitKey(1) & 255);
 
@@ -628,6 +695,7 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		break;
 	}
 
+	FrameratePolicy();
 	return RTLIB_OK;
 }
 
