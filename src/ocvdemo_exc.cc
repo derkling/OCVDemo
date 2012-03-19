@@ -649,6 +649,14 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	if (CurrentAWM() == 2) {
 		fprintf(stderr, "\n");
 		return RTLIB_OK;
+	}
+
+	// Raise AWM upper-bound
+	if (cnstr.awm < 2) {
+		cnstr.awm = 2;
+		SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
+		fprintf(stderr, FMT_INF("\nRaise AWM upper bound: %d\n"), cnstr.awm);
+	}
 
 	// NAP not asserted: asserting a new one
 	nap = (static_cast<uint8_t>((1 - cam.fps_dev) * 100) % 100);
