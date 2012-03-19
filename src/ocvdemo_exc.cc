@@ -608,6 +608,12 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	fprintf(stderr, FMT_INF("AWM [%d], FPS deviation: %5.1f[%%]\r"),
 				CurrentAWM(), (cam.fps_dev - 1)* 100);
 
+	// Set MED resolution on AWM2
+	if (CurrentAWM() >= 1 &&
+		cam.fps_dev >= 3) {
+		ResolutionUp();
+	}
+
 	// Check if the current FPS is at least 80% of the required FPS
 	if (cam.fps_dev >= 0.85) {
 		napped = false;
