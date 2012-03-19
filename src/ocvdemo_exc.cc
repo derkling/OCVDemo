@@ -615,7 +615,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	}
 
 	// Check if the current FPS is at least 80% of the required FPS
-	if (cam.fps_dev >= 0.85) {
+	if (cam.fps_dev >= 0.90) {
 		napped = false;
 		tcheck = 1000;
 		urc = 4;
