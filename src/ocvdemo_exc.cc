@@ -23,11 +23,11 @@
 #include "ocvdemo_exc.h"
 #include "buttons.h"
 
-// These are a set of useful debugging log formatters
-#define FMT_DBG(fmt) BBQUE_FMT(COLOR_LGRAY,  "TESTA_EXC  [DBG]", fmt)
-#define FMT_INF(fmt) BBQUE_FMT(COLOR_GREEN,  "TESTA_EXC  [INF]", fmt)
-#define FMT_WRN(fmt) BBQUE_FMT(COLOR_YELLOW, "TESTA_EXC  [WRN]", fmt)
-#define FMT_ERR(fmt) BBQUE_FMT(COLOR_RED,    "TESTA_EXC  [ERR]", fmt)
+// Setup logging
+#undef  BBQUE_LOG_MODULE
+#define BBQUE_LOG_MODULE "ocvdemo.exc"
+#undef  BBQUE_LOG_UID
+#define BBQUE_LOG_UID GetUid()
 
 using namespace bbque::utils;
 using namespace cv;
@@ -92,14 +92,14 @@ OCVDemo::OCVDemo(std::string const & name,
 	cam.frames_max = frames_max;
 	cam.effect_idx = EFF_NONE;
 	if (CAMERA_SOURCE) {
-		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
+		fprintf(stderr, FW("OpenCV Demo EXC (webcam %d, max %d [fps]\n"),
 				cam.id, cam.fps_max);
 	} else {
-		fprintf(stderr, FMT_WRN("OpenCV Demo EXC (video %s, max %d [fps]\n"),
+		fprintf(stderr, FW("OpenCV Demo EXC (video %s, max %d [fps]\n"),
 				cam.video.c_str(), cam.fps_max);
 	}
 	if (cam.frames_max) {
-		fprintf(stderr, FMT_WRN("Decoding up-to %d frames\n"), cam.frames_max);
+		fprintf(stderr, FW("Decoding up-to %d frames\n"), cam.frames_max);
 	}
 
 	// Setup default constraint
@@ -107,7 +107,7 @@ OCVDemo::OCVDemo(std::string const & name,
 	cnstr.type = UPPER_BOUND;
 	cnstr.awm = 1;
 	SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
-	fprintf(stderr, FMT_INF("Init AWM ID upper bound: %d\n"), cnstr.awm);
+	fprintf(stderr, FI("Init AWM ID upper bound: %d\n"), cnstr.awm);
 
 }
 
@@ -118,7 +118,7 @@ OCVDemo::~OCVDemo() {
 
 RTLIB_ExitCode_t OCVDemo::SetResolutionCamera(uint8_t type) {
 
-	fprintf(stderr, FMT_INF("Setup camera resolution: [%d x %d]...\n"),
+	fprintf(stderr, FI("Setup camera resolution: [%d x %d]...\n"),
 			CAM_PRESET_WIDTH(type), CAM_PRESET_HEIGHT(type));
 
 	cam.cap.set(CV_CAP_PROP_FRAME_WIDTH, CAM_PRESET_WIDTH(type));
@@ -172,9 +172,9 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 
 	// Keep track of current camera resolution
 	cam.res_id = type;
-	fprintf(stderr, FMT_DBG("Current resolution %s: [%d x %d]...\n"),
+	DB(fprintf(stderr, FD("Current resolution %s: [%d x %d]...\n"),
 			resolutionStr[cam.res_id],
-			CAM_WIDTH(cam), CAM_HEIGHT(cam));
+			CAM_WIDTH(cam), CAM_HEIGHT(cam)));
 
 	return result;
 
@@ -183,12 +183,12 @@ RTLIB_ExitCode_t OCVDemo::SetResolution(uint8_t type) {
 RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	Mat frame;
 
-	fprintf(stderr, FMT_INF("Opening video [%s]...\n"), cam.video.c_str());
+	fprintf(stderr, FI("Opening video [%s]...\n"), cam.video.c_str());
 	cam.cap = VideoCapture(cam.video);
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, FMT_ERR("ERROR: opening video [%s] FAILED!\n"),
+		fprintf(stderr, FE("ERROR: opening video [%s] FAILED!\n"),
 				cam.video.c_str());
 		return RTLIB_ERROR;
 	}
@@ -196,7 +196,7 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	// Get first frame which is used to read the native resolution
 	cam.cap >> frame;
 	if (frame.empty()) {
-		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
+		fprintf(stderr, FE("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -220,12 +220,12 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceCamera() {
 	cam.wcap = std::string(wcap);
 
 	// Open input device
-	fprintf(stderr, FMT_INF("Opening V4L2 device [/dev/video%d]...\n"), cam.id);
+	fprintf(stderr, FI("Opening V4L2 device [/dev/video%d]...\n"), cam.id);
 	cam.cap = VideoCapture(cam.id);
 
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
-		fprintf(stderr, FMT_ERR("ERROR: opening camera [%s] FAILED!\n"),
+		fprintf(stderr, FE("ERROR: opening camera [%s] FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -250,7 +250,7 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 	if (result != RTLIB_OK)
 		return result;
 
-	fprintf(stderr, FMT_INF("Max (native) resolution: [%d x %d]\n"),
+	fprintf(stderr, FI("Max (native) resolution: [%d x %d]\n"),
 			cam.max_res.width, cam.max_res.height);
 
 	// Setup initial resolution to medium
@@ -271,7 +271,7 @@ RTLIB_ExitCode_t OCVDemo::onSetup() {
 
 
 RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
-	fprintf(stderr, FMT_WRN("OCVDemo::onConfigure(): "
+	fprintf(stderr, FW("OCVDemo::onConfigure(): "
 				"EXC [%s], AWM[%02d]\n"),
 				exc_name.c_str(), awm_id);
 
@@ -281,7 +281,7 @@ RTLIB_ExitCode_t OCVDemo::onConfigure(uint8_t awm_id) {
 
 	// Start next frame grabbing
 	if (!cam.cap.grab()) {
-		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
+		fprintf(stderr, FE("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -304,7 +304,7 @@ RTLIB_ExitCode_t OCVDemo::getImageFromVideo() {
 			goto exit_eof;
 	}
 	if (cam.frame.empty()) {
-		fprintf(stderr, FMT_ERR("ERROR: video frame grabbing FAILED!\n"));
+		fprintf(stderr, FE("ERROR: video frame grabbing FAILED!\n"));
 		return RTLIB_ERROR;
 	}
 
@@ -319,14 +319,14 @@ RTLIB_ExitCode_t OCVDemo::getImageFromCamera() {
 
 	// Acquire a frame from the camera
 	if (!cam.cap.retrieve(cam.frame)) {
-		fprintf(stderr, FMT_ERR("ERROR: %s frame retriving FAILED!\n"),
+		fprintf(stderr, FE("ERROR: %s frame retriving FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
 
 	// Start next frame grabbing
 	if (!cam.cap.grab()) {
-		fprintf(stderr, FMT_ERR("ERROR: %s frame grabbing FAILED!\n"),
+		fprintf(stderr, FE("ERROR: %s frame grabbing FAILED!\n"),
 				cam.wcap.c_str());
 		return RTLIB_ERROR;
 	}
@@ -497,7 +497,7 @@ RTLIB_ExitCode_t OCVDemo::postProcess() {
 		doSurf();
 		break;
 	default:
-		fprintf(stderr, FMT_WRN("Unknowen effect required\n"));
+		fprintf(stderr, FW("Unknowen effect required\n"));
 		return RTLIB_ERROR;
 	}
 
@@ -516,7 +516,7 @@ double OCVDemo::updateFps() {
 	if (tnow >= update_ms) {
 		elapsed_ms = tnow - tstart;
 		cam.fps_cur = cam.frames_count * 1000.0 / elapsed_ms;
-		DB(fprintf(stderr, FMT_DBG("Processing @ FPS = %.2f\n"), cam.fps_cur));
+		DB(fprintf(stderr, FD("Processing @ FPS = %.2f\n"), cam.fps_cur));
 		// Setup references for next update
 		tstart = bbque_tmr.getElapsedTimeMs();
 		update_ms = tstart + 250.0;
@@ -541,7 +541,7 @@ void OCVDemo::forceFps() {
 	}
 
 	tnow = bbque_tmr.getElapsedTimeMs();
-//	fprintf(stderr, FMT_INF("TP: %.4f, TN: %.4f\n"),
+//	fprintf(stderr, FI("TP: %.4f, TN: %.4f\n"),
 //			tstart, tnow);
 
 	cycle_time = tnow - tstart;
@@ -553,7 +553,7 @@ void OCVDemo::forceFps() {
 	cam.fps_dev = expec_time / cycle_time;
 
 	if (cycle_time < expec_time) {
-		DB(fprintf(stderr, FMT_INF("Cycle Time: %3.3f[ms], ET: %3.3f[ms], "
+		DB(fprintf(stderr, FI("Cycle Time: %3.3f[ms], ET: %3.3f[ms], "
 						"Sleep time %u [us]\n"),
 			cycle_time, expec_time, sleep_us));
 		usleep(sleep_us);
@@ -605,7 +605,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	// New adjustment time
 	tprv = tnow;
 
-	fprintf(stderr, FMT_INF("AWM [%d], FPS deviation: %5.1f[%%]\r"),
+	fprintf(stderr, FI("AWM [%d], FPS deviation: %5.1f[%%]\r"),
 				CurrentAWM(), (cam.fps_dev - 1)* 100);
 
 	// Set MED resolution on AWM2
@@ -630,7 +630,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	if (cam.effect_idx == EFF_NONE) {
 		scaling = ResolutionDown();
 		if (scaling)
-			fprintf(stderr, FMT_INF("\nUnder framerate %.1f[%%]\n"),
+			fprintf(stderr, FI("\nUnder framerate %.1f[%%]\n"),
 					cam.fps_dev * 100);
 		return RTLIB_OK;
 	}
@@ -640,7 +640,7 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 		// NAP request timedout: reducing resolution
 		scaling = ResolutionDown();
 		if (scaling)
-			fprintf(stderr, FMT_INF("\nNAP timeout: downscaling\n"));
+			fprintf(stderr, FI("\nNAP timeout: downscaling\n"));
 		napped = false;
 		return RTLIB_OK;
 	}
@@ -655,12 +655,12 @@ RTLIB_ExitCode_t OCVDemo::FrameratePolicy() {
 	if (cnstr.awm < 2) {
 		cnstr.awm = 2;
 		SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
-		fprintf(stderr, FMT_INF("\nRaise AWM upper bound: %d\n"), cnstr.awm);
+		fprintf(stderr, FI("\nRaise AWM upper bound: %d\n"), cnstr.awm);
 	}
 
 	// NAP not asserted: asserting a new one
 	nap = (static_cast<uint8_t>((1 - cam.fps_dev) * 100) % 100);
-	fprintf(stderr, FMT_INF("\nNAP assert [%d]\n"), nap);
+	fprintf(stderr, FI("\nNAP assert [%d]\n"), nap);
 	SetGoalGap(nap);
 	napped = true;
 
@@ -692,19 +692,19 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		ResolutionDown();
 		break;
 	case 'c':
-		fprintf(stderr, FMT_INF("Enable [CANNY] effect\n"));
+		fprintf(stderr, FI("Enable [CANNY] effect\n"));
 		cam.effect_idx = EFF_CANNY;
 		break;
 	case 'f':
-		fprintf(stderr, FMT_INF("Enable [FAST] effect\n"));
+		fprintf(stderr, FI("Enable [FAST] effect\n"));
 		cam.effect_idx = EFF_FAST;
 		break;
 	case 's':
-		fprintf(stderr, FMT_INF("Enable [SURF] effect\n"));
+		fprintf(stderr, FI("Enable [SURF] effect\n"));
 		cam.effect_idx = EFF_SURF;
 		break;
 	case 'q':
-		fprintf(stderr, FMT_INF("Disable effects\n"));
+		fprintf(stderr, FI("Disable effects\n"));
 		cam.effect_idx = EFF_NONE;
 
 		if (cnstr.awm < 2)
@@ -713,7 +713,7 @@ RTLIB_ExitCode_t OCVDemo::onMonitor() {
 		// Release the AWM upper-bound
 		cnstr.awm = 1;
 		SetConstraints(&cnstr, sizeof(cnstr)/sizeof(RTLIB_Constraint_t));
-		fprintf(stderr, FMT_INF("Lower AWM upper bound: %d\n"), cnstr.awm);
+		fprintf(stderr, FI("Lower AWM upper bound: %d\n"), cnstr.awm);
 
 		break;
 	}
@@ -727,7 +727,7 @@ bool OCVDemo::ResolutionUp() {
 	if (cam.res_id == RES_HIG)
 		return false;
 
-	fprintf(stderr, FMT_INF("Resolution Scale UP\n"));
+	fprintf(stderr, FI("Resolution Scale UP\n"));
 	++cam.res_id;
 	SetResolution(cam.res_id);
 	return true;
@@ -738,7 +738,7 @@ bool OCVDemo::ResolutionDown() {
 	if (cam.res_id == RES_LOW)
 		return false;
 
-	fprintf(stderr, FMT_INF("Resolution Scale DOWN\n"));
+	fprintf(stderr, FI("Resolution Scale DOWN\n"));
 	--cam.res_id;
 	SetResolution(cam.res_id);
 	return true;

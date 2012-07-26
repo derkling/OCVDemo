@@ -31,11 +31,9 @@
 #define EXC_BASENAME "OCVDemo"
 #define RCP_BASENAME "ocvdemo"
 
-// These are a set of useful debugging log formatters
-#define FMT_DBG(fmt) BBQUE_FMT(COLOR_LGRAY,  "MAIN       [DBG]", fmt)
-#define FMT_INF(fmt) BBQUE_FMT(COLOR_GREEN,  "MAIN       [INF]", fmt)
-#define FMT_WRN(fmt) BBQUE_FMT(COLOR_YELLOW, "MAIN       [WRN]", fmt)
-#define FMT_ERR(fmt) BBQUE_FMT(COLOR_RED,    "MAIN       [ERR]", fmt)
+// Setup logging
+#undef  BBQUE_LOG_MODULE
+#define BBQUE_LOG_MODULE "ocvdemo"
 
 namespace po = boost::program_options;
 
@@ -188,9 +186,9 @@ int main(int argc, char *argv[]) {
 	ParseCommandLine(argc, argv);
 
 	// Welcome screen
-	fprintf(stdout, FMT_INF(".:: BBQ OpenCV Demo Application (ver. %s)::.\n"),
+	fprintf(stdout, FI(".:: BBQ OpenCV Demo Application (ver. %s)::.\n"),
 			g_git_version);
-	fprintf(stdout, FMT_INF("Built: " __DATE__  " " __TIME__ "\n\n"));
+	fprintf(stdout, FI("Built: " __DATE__  " " __TIME__ "\n\n"));
 
 	// Init  RTLib library and setup the BBQ communication channel
 	RTLIB_Init(::basename(argv[0]), &rtlib);
@@ -204,7 +202,7 @@ int main(int argc, char *argv[]) {
 	// Wait for the demo to complete
 	pexc->WaitCompletion();
 
-	fprintf(stderr, FMT_INF("===== BBQ OpenCV Demo DONE! =====\n"));
+	fprintf(stderr, FI("===== BBQ OpenCV Demo DONE! =====\n"));
 	return EXIT_SUCCESS;
 }
 

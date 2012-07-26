@@ -56,7 +56,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 # Options common to all build version
-set (CMAKE_CXX_FLAGS "-std=c++0x -Wall -lrt")
+set (CMAKE_CXX_FLAGS "-std=c++0x -Wall -lrt -DBBQUE_APP")
 
 # These are used to clean-up unsed RTLib symbols
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
