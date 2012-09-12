@@ -1,0 +1,10 @@
+
+	.:: OCVDemo - BBQ-Controlled OpenCV Application ::.
+
+This is a simple example of a Computer Vision application run-time controlled
+by the BarbequeRTRM framework. This application is intended to be compiled from
+within the BOSP project.
+
+For more information on BOSP and the BarbequeRTRM framework look at the
+official project website:
+http://bosp.dei.polimi.it
