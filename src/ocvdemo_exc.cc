@@ -186,6 +186,9 @@ RTLIB_ExitCode_t OCVDemo::SetupSourceVideo() {
 	fprintf(stderr, FI("Opening video [%s]...\n"), cam.video.c_str());
 	cam.cap = VideoCapture(cam.video);
 
+	// Setup camera name
+	cam.wcap = cam.video.c_str();
+
 	// Check if video soure has been properly initialized
 	if (!cam.cap.isOpened()) {
 		fprintf(stderr, FE("ERROR: opening video [%s] FAILED!\n"),
